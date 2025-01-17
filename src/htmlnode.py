@@ -10,6 +10,8 @@ class HTMLNode:
     
     def props_to_html(self):
         result = ""
+        if self.props == None:
+            return ""
         for k, v in self.props.items():
             result += f' {k}="{v}"'
         return result
@@ -35,3 +37,16 @@ class HTMLNode:
         if self.props != None:
             result.append(f"props={self.props}")
         return f"HTMLNode(" + ", ".join(result) + ")"
+
+
+class LeafNode(HTMLNode):
+    def __init__(self, tag, value, props=None):
+        if value == None:
+            raise ValueError("Leaf node must have a value")
+        super().__init__(tag=tag, value=value, props=props)
+
+    def to_html(self):
+        if self.tag == None:
+            return self.value
+        return f'<{self.tag}{self.props_to_html()}>{self.value}</{self.tag}>'
+        
