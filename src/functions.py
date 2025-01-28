@@ -26,7 +26,55 @@ def extract_markdown_links(text):
 	_type_check(text, str)
 	return re.findall(r"[^!]\[(.*?)\]\((.*?)\)", text)
 
+def split_nodes_image(old_nodes):
+	_type_check(old_nodes, list)
+	result = []
+	for old_node in old_nodes:
+		image_tuples = extract_markdown_images(old_node.text)
+		images = _node_generator(image_tuples, TextType.IMAGE)
+		if len(images) == 0:
+			result.append(old_node)
+		else:
+			result.extend(_node_splitter(old_node.text, images, TextType.IMAGE))
+	return result
+
+def split_nodes_link(old_nodes):
+	_type_check(old_nodes, list)
+	result = []
+	for old_node in old_nodes:
+		link_tuples = extract_markdown_links(old_node.text)
+		links = _node_generator(link_tuples, TextType.LINK)
+		if len(links) == 0:
+			result.append(old_node)
+		else:
+			result.extend(_node_splitter(old_node.text, links, TextType.LINK))
+	return result
+
+def _node_generator(tup_list, text_type):
+	if text_type != TextType.IMAGE and text_type != TextType.LINK:
+		raise Exception(f"node can't be generated for this type: {text_type}")
+	result = []
+	for tup in tup_list:
+		result.append(TextNode(tup[0], text_type, tup[1]))
+	return result
+
+def _node_splitter(text, nodes, text_type):
+	result = []
+	for index in range(0, len(nodes)):
+		if text_type == TextType.IMAGE:
+			text_split = text.split(f"![{nodes[index].text}]({nodes[index].url})", 1)
+		else:
+			text_split = text.split(f"[{nodes[index].text}]({nodes[index].url})", 1)
+
+		if text_split[0] != "":
+			result.append(TextNode(text_split[0], TextType.TEXT))
+		result.append(nodes[index])
+		if len(text_split) > 1 and text_split[1] != "":
+			text = text_split[1]
+			if index + 1 == len(nodes):
+				result.append(TextNode(text, TextType.TEXT))
+	return result
+
 def _type_check(element, expected_class):
 	if not isinstance(element, expected_class):
-		raise TypeError(f"wrong type, expected string, but got {type(element)}")
-	
+		raise TypeError(f"wrong type, expected {expected_class}, but got {type(element)}")
