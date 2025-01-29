@@ -2,6 +2,7 @@ from htmlnode import *
 from textnode import *
 import re
 
+
 def split_nodes_delimiter(old_nodes, delimiter, text_type):
 	new_nodes = []
 	for node in old_nodes:
@@ -18,13 +19,16 @@ def split_nodes_delimiter(old_nodes, delimiter, text_type):
 			new_nodes.append(node)
 	return new_nodes
 
+
 def extract_markdown_images(text):
 	_type_check(text, str)
 	return re.findall(r"!\[(.*?)\]\((.*?)\)", text)
 
+
 def extract_markdown_links(text):
 	_type_check(text, str)
 	return re.findall(r"[^!]\[(.*?)\]\((.*?)\)", text)
+
 
 def split_nodes_image(old_nodes):
 	_type_check(old_nodes, list)
@@ -38,6 +42,7 @@ def split_nodes_image(old_nodes):
 			result.extend(_node_splitter(old_node.text, images, TextType.IMAGE))
 	return result
 
+
 def split_nodes_link(old_nodes):
 	_type_check(old_nodes, list)
 	result = []
@@ -50,6 +55,30 @@ def split_nodes_link(old_nodes):
 			result.extend(_node_splitter(old_node.text, links, TextType.LINK))
 	return result
 
+
+def text_to_textnodes(text):
+	_type_check(text, str)
+	delimiters = [("**", TextType.BOLD), ("*", TextType.ITALIC), ("`", TextType.CODE)]
+	node = TextNode(text, TextType.TEXT)
+	result = [node]
+	for delimiter in delimiters:
+		result = split_nodes_delimiter(result, delimiter[0], delimiter[1])
+	result = split_nodes_image(result)
+	result = split_nodes_link(result)
+	return result
+
+
+def markdown_to_blocks(markdown):
+	md_blocks = markdown.split("\n\n")
+	result = []
+	for md_block in md_blocks:
+		block = md_block.lstrip()
+		block = block.rstrip()
+		if len(block) > 0:
+			result.append(block)
+	return result
+
+
 def _node_generator(tup_list, text_type):
 	if text_type != TextType.IMAGE and text_type != TextType.LINK:
 		raise Exception(f"node can't be generated for this type: {text_type}")
@@ -57,6 +86,7 @@ def _node_generator(tup_list, text_type):
 	for tup in tup_list:
 		result.append(TextNode(tup[0], text_type, tup[1]))
 	return result
+
 
 def _node_splitter(text, nodes, text_type):
 	result = []
@@ -74,6 +104,7 @@ def _node_splitter(text, nodes, text_type):
 			if index + 1 == len(nodes):
 				result.append(TextNode(text, TextType.TEXT))
 	return result
+
 
 def _type_check(element, expected_class):
 	if not isinstance(element, expected_class):

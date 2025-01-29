@@ -3,9 +3,11 @@ from textnode import *
 from functions import *
 
 class TestFunctions(unittest.TestCase):
-    def _string_setup(self):
+    def _inline_string_setup(self):
         return """This is text with a ![rick roll](https://i.imgur.com/aKaOqIh.gif) and ![obi wan](https://i.imgur.com/fJRm4Vk.jpeg). This is text with a link [to boot dev](https://www.boot.dev) and [to youtube](https://www.youtube.com/@bootdotdev)."""
-
+    
+    def _block_string_setup(self):
+        return """    # This is a heading   \n\n\n\n\nThis is a paragraph of text. It has some **bold** and *italic* words inside of it.    \n\n\n\n       \n\n\n* This is the first list item in a list block\n* This is a list item\n* This is another list item"""
 
     def test_split_nodes_delimiter_simple(self):
         node = TextNode("This is text with a `code block` word", TextType.TEXT)
@@ -36,13 +38,13 @@ class TestFunctions(unittest.TestCase):
         self.assertEqual(comp_nodes, new_nodes)
 
     def test_extract_markdown_links_basic(self):
-        text = self._string_setup()
+        text = self._inline_string_setup()
         test_comparison = [('to boot dev', 'https://www.boot.dev'), ('to youtube', 'https://www.youtube.com/@bootdotdev')]
         test_result = extract_markdown_links(text)
         self.assertEqual(test_comparison, test_result)
 
     def test_extract_markdown_images_basic(self):
-        text = self._string_setup()
+        text = self._inline_string_setup()
         test_comparison = [('rick roll', 'https://i.imgur.com/aKaOqIh.gif'), ('obi wan', 'https://i.imgur.com/fJRm4Vk.jpeg')]
         test_result = extract_markdown_images(text)
         self.assertEqual(test_comparison, test_result)
@@ -68,7 +70,7 @@ class TestFunctions(unittest.TestCase):
         self.assertEqual(test_comparison, test_result_images)
 
     def test_split_nodes_image_mixed(self):
-        node = TextNode(self._string_setup(), TextType.TEXT)
+        node = TextNode(self._inline_string_setup(), TextType.TEXT)
         test_result = split_nodes_image([node])
         test_comparison = [
             TextNode("This is text with a ", TextType.TEXT),
@@ -80,7 +82,7 @@ class TestFunctions(unittest.TestCase):
         self.assertEqual(test_comparison, test_result)
 
     def test_split_nodes_links_mixed(self):
-        node = TextNode(self._string_setup(), TextType.TEXT)
+        node = TextNode(self._inline_string_setup(), TextType.TEXT)
         test_result = split_nodes_link([node])
         test_comparison = [
             TextNode("This is text with a ![rick roll](https://i.imgur.com/aKaOqIh.gif) and ![obi wan](https://i.imgur.com/fJRm4Vk.jpeg). This is text with a link ", TextType.TEXT),
@@ -110,6 +112,29 @@ class TestFunctions(unittest.TestCase):
         with self.assertRaises(TypeError) as context:
             split_nodes_link(None)
         self.assertEqual(str(context.exception), "wrong type, expected <class 'list'>, but got <class 'NoneType'>")
+
+    def test_text_to_textnodes(self):
+        test_string = "This is **text** with an *italic* word and a `code block` and an ![obi wan image](https://i.imgur.com/fJRm4Vk.jpeg) and a [link](https://boot.dev)"
+        test_result = text_to_textnodes(test_string)
+        test_comparison = [
+            TextNode("This is ", TextType.TEXT),
+            TextNode("text", TextType.BOLD),
+            TextNode(" with an ", TextType.TEXT),
+            TextNode("italic", TextType.ITALIC),
+            TextNode(" word and a ", TextType.TEXT),
+            TextNode("code block", TextType.CODE),
+            TextNode(" and an ", TextType.TEXT),
+            TextNode("obi wan image", TextType.IMAGE, "https://i.imgur.com/fJRm4Vk.jpeg"),
+            TextNode(" and a ", TextType.TEXT),
+            TextNode("link", TextType.LINK, "https://boot.dev"),
+        ]
+        self.assertEqual(test_comparison, test_result)
+
+    def test_markdown_to_blocks(self):
+        markdown = self._block_string_setup()
+        test_result = markdown_to_blocks(markdown)
+        test_comparison = ['# This is a heading', 'This is a paragraph of text. It has some **bold** and *italic* words inside of it.', '* This is the first list item in a list block\n* This is a list item\n* This is another list item']
+        self.assertEqual(test_comparison, test_result)
 
 if __name__ == "__main__":
     unittest.main()
