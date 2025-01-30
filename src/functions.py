@@ -68,17 +68,6 @@ def text_to_textnodes(text):
 	return result
 
 
-def markdown_to_blocks(markdown):
-	md_blocks = markdown.split("\n\n")
-	result = []
-	for md_block in md_blocks:
-		block = md_block.lstrip()
-		block = block.rstrip()
-		if len(block) > 0:
-			result.append(block)
-	return result
-
-
 def _node_generator(tup_list, text_type):
 	if text_type != TextType.IMAGE and text_type != TextType.LINK:
 		raise Exception(f"node can't be generated for this type: {text_type}")
