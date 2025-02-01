@@ -62,17 +62,11 @@ class ParentNode(HTMLNode):
 
     def to_html(self):
         self._check_attributes()
-        if type(self) is ParentNode:
-            result = ""
-            for node in self.children:
-                result += node.to_html()
-            if type(self.props) is None:
-                props = ""
-            else:
-                props = self.props_to_html()
-            return f'<{self.tag}{props}>{result}</{self.tag}>'
-        else:
-            return self.to_html()
+        result = ""
+        for node in self.children:
+            result += node.to_html()
+        return f'<{self.tag}{self.props_to_html()}>{result}</{self.tag}>'
+
         
     def _check_attributes(self):
         if type(self.tag) is not str:

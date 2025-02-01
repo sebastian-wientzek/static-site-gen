@@ -4,7 +4,7 @@ from enums import BlockType
 
 class TestFunctions(unittest.TestCase):  
     def _block_string_setup(self):
-        return """    # This is a heading   \n\n\n\n\nThis is a paragraph of text. It has some **bold** and *italic* words inside of it.    \n\n\n\n       \n\n\n* This is the first list item in a list block\n* This is a list item\n* This is another list item"""
+        return """    # This is a heading   \n\n\n\n\nThis is a paragraph of text. It has some **bold** and *italic* words inside of it.    \n\n\n\n       \n\n\n* This is the first list item in a list block\n* This is a list item\n* This is another list item\n\n"""
 
     def test_markdown_to_blocks(self):
         markdown = self._block_string_setup()

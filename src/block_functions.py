@@ -15,7 +15,7 @@ def block_to_block_type(markdown):
 		return BlockType.UNORDERED_LIST
 	
 	for index in range(0, len(md_splitted)):
-		if len(md_splitted[index]) < 3 or md_splitted[index][0:3] != f"{index+1}. ":
+		if len(md_splitted[index]) < 3 or not md_splitted[index].startswith(f"{index+1}. "):
 			return BlockType.PARAGRAPH
 		
 	return BlockType.ORDERED_LIST
