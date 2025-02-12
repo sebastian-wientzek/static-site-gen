@@ -3,6 +3,30 @@ from textnode import *
 import re
 
 
+def folder_deep_search(start_folder, folders=None, files=None):
+	if folders == None and files == None:
+		folders = [start_folder]
+		files = []
+
+	if not os.path.exists(start_folder):
+		raise Exception(f"The given path '{start_folder}' doesn not exist.")
+	
+	current_folder = os.listdir(start_folder)
+
+	for elem in current_folder:
+		joined_path = os.path.join(start_folder, elem)
+
+		if os.path.isfile(joined_path):
+			files.append(joined_path)
+		
+		if os.path.isdir(joined_path):
+			folders.append(joined_path)
+			folder_deep_search(joined_path, folders, files)
+
+	return (folders, files)
+
+
+
 def split_nodes_delimiter(old_nodes, delimiter, text_type):
 	new_nodes = []
 	for node in old_nodes:
