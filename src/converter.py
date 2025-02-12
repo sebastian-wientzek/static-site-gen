@@ -3,6 +3,26 @@ from block_functions import *
 from htmlnode import *
 from textnode import *
 from enums import *
+import os
+
+
+def generate_page(from_path, template_path, dest_path):
+    print(f"Generating page from {from_path} to {dest_path} using {template_path}")
+    with open(from_path) as md_file:
+        md = md_file.read() 
+    
+    with open(template_path) as template_file:
+        template = template_file.read()
+
+    html_content = markdown_to_html_node(md).to_html()
+    title = extract_title(md)
+    template = template.replace("{{ Title }}", title)
+    template = template.replace("{{ Content }}", html_content)
+
+    dir_path = os.path.dirname(dest_path)
+    os.makedirs(dir_path, exist_ok=True)
+    with open(dest_path, "w") as result_html:
+        result_html.write(template)
 
 
 def markdown_to_html_node(markdown):
@@ -43,7 +63,13 @@ def list_block_to_node(block, block_type):
     child_nodes = []
 
     for item in item_list:
-        child_nodes.append(LeafNode("li", item.split(" ", 1)[1]))
+        text = item.split(" ", 1)[1]
+        text_nodes = text_to_textnodes(text)
+        html_nodes = []
+        for text_node in text_nodes:
+            html_nodes.append(text_node_to_html_node(text_node))
+        
+        child_nodes.append(ParentNode("li", html_nodes))
 
     return ParentNode(block_tag, child_nodes)
 
@@ -62,5 +88,5 @@ def code_block_to_node(block):
 
 
 def quote_block_to_node(block):
-    block_clean = " ".join(block.replace(">","").split("\n"))
+    block_clean = " ".join(block.replace(">","").lstrip().rstrip().split("\n"))
     return LeafNode("blockquote", block_clean)

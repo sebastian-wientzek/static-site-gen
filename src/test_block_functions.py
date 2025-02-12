@@ -56,6 +56,18 @@ class TestFunctions(unittest.TestCase):
         test_case = "1. item1\n2. item2\n3. item3\n"
         self.assertEqual(BlockType.PARAGRAPH, block_to_block_type(test_case))
 
+    def test_extract_title_positive(self):
+        test_case = "#        This is a Title       "
+        test_comparison = "This is a Title"
+        test_result = extract_title(test_case)
+        self.assertEqual(test_comparison, test_result)
+
+    def test_extract_title_negative(self):
+        test_case = "## This is a H2 Header        "
+        test_comparison = "no title found."
+        with self.assertRaises(Exception) as context:
+            extract_title(test_case)
+        self.assertEqual(str(context.exception), test_comparison)
         
 if __name__ == "__main__":
     unittest.main()

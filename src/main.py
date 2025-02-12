@@ -1,10 +1,13 @@
 from textnode import TextNode, TextType
 from htmlnode import HTMLNode, LeafNode
 from functions import *
+from block_functions import *
+from converter import *
 import os, shutil
 
 def main():
 	copy_static_to_public()
+	generate_page("content/index.md", "template/template.html", "public/index.html")
 
 
 def copy_static_to_public():
