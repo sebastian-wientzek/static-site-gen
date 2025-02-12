@@ -1,6 +1,7 @@
 from htmlnode import *
 from textnode import *
 import re
+import os
 
 
 def folder_deep_search(start_folder, folders=None, files=None):
@@ -51,7 +52,7 @@ def extract_markdown_images(text):
 
 def extract_markdown_links(text):
 	_type_check(text, str)
-	return re.findall(r"[^!]\[(.*?)\]\((.*?)\)", text)
+	return re.findall(r"[^!]?\[(.*?)\]\((.*?)\)", text)
 
 
 def split_nodes_image(old_nodes):

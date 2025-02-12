@@ -7,7 +7,7 @@ import os, shutil
 
 def main():
 	copy_static_to_public()
-	generate_page("content/index.md", "template/template.html", "public/index.html")
+	generate_pages_recursive("content/", "template/template.html", "public/")
 
 
 def copy_static_to_public():
