@@ -7,7 +7,7 @@ import os, shutil
 import sys
 
 def main(args):
-	basepath = args[0]
+	basepath = args[1]
 	copy_static_to_target()
 	generate_pages_recursive("content/", "template/template.html", "docs/", basepath)
 
