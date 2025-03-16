@@ -83,7 +83,7 @@ def split_nodes_link(old_nodes):
 
 def text_to_textnodes(text):
 	_type_check(text, str)
-	delimiters = [("**", TextType.BOLD), ("*", TextType.ITALIC), ("`", TextType.CODE)]
+	delimiters = [("**", TextType.BOLD), ("_", TextType.ITALIC), ("`", TextType.CODE)]
 	node = TextNode(text, TextType.TEXT)
 	result = [node]
 	for delimiter in delimiters:
